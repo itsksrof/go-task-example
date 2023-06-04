@@ -12,8 +12,8 @@ const ARGS_LENGTH = 3
 
 var bufSize = 2 << 20 // Default buffer size is roughly 2MBs
 
-var commands = func() map[string]func(v ...any) {
-	return map[string]func(v ...any){
+var commands = func() map[string]func(v ...any) string {
+	return map[string]func(v ...any) string{
 		"--help": help,
 		"-h":     help,
 		"--out":  out,
@@ -21,9 +21,8 @@ var commands = func() map[string]func(v ...any) {
 	}
 }
 
-func help(params ...any) {
-	fmt.Println(`
-Usage: grab [OPTION] ... [FILE] ...
+func help(params ...any) string {
+	return `Usage: grab [OPTION] ... [FILE] ...
 Grab FILE(s) content and show it through standard output
 
 --help, -h	display this help and exit
@@ -32,11 +31,12 @@ Grab FILE(s) content and show it through standard output
 Examples:
 
 grab -o example.json
-grab -o example.json example.txt
-	`)
+grab -o example.json example.txt`
 }
 
-func out(params ...any) {
+func out(params ...any) string {
+	buffer := bytes.NewBuffer(make([]byte, bufSize))
+
 	for _, param := range params {
 		fileName, _ := param.(string)
 		file, err := os.Open(fileName)
@@ -46,15 +46,13 @@ func out(params ...any) {
 		defer file.Close()
 
 		reader := bufio.NewReader(file)
-		buffer := bytes.NewBuffer(make([]byte, bufSize))
 		_, err = reader.Read(buffer.Bytes())
 		if err != nil {
 			panic(err)
 		}
-
-		fmt.Println("Filename:", file.Name())
-		fmt.Println(buffer.String())
 	}
+
+	return buffer.String()
 }
 
 func main() {
@@ -74,9 +72,9 @@ func main() {
 
 	if len(os.Args) >= ARGS_LENGTH {
 		for _, arg := range os.Args[2:] {
-			cmd(arg)
+			fmt.Println(cmd(arg))
 		}
 	} else {
-		cmd()
+		fmt.Println(cmd())
 	}
 }
