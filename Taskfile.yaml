@@ -3,4 +3,18 @@ version: '3'
 tasks:
   build:
     cmds:
-      - go build -v -o grab main.go
+      - mkdir ./bin
+      - GOARCH=amd64 GOOS=linux go build -v -o ./bin/grab_amd64_linux main.go
+      - GOARCH=arm64 GOOS=linux go build -v -o ./bin/grab_arm64_linux main.go
+      - GOARCH=amd64 GOOS=darwin go build -v -o ./bin/grab_amd64_darwin main.go
+      - GOARCH=arm64 GOOS=darwin go build -v -o ./bin/grab_arm64_darwin main.go
+      - GOARCH=amd64 GOOS=windows go build -v -o ./bin/grab_amd64_windows.exe main.go
+      - GOARCH=arm64 GOOS=windows go build -v -o ./bin/grab_arm64_windows.exe main.go
+      - GOARCH=386 GOOS=windows go build -v -o ./bin/grab_386_windows.exe main.go
+      - go test -c -o ./bin/grab_test
+  test:
+    cmds:
+      - ./bin/grab_test
+  clean:
+    cmds:
+      - rm -rf ./bin
