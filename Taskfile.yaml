@@ -3,7 +3,4 @@ version: '3'
 tasks:
   build:
     cmds:
-      - go build -v -o ./main.so main.go
-  run:
-    cmds:
-      - ./main.so
+      - go build -v -o grab main.go
